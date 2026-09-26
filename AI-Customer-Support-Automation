@@ -1,0 +1,472 @@
+{
+  "name": "AI Customer Support Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "working",
+        "options": {
+          "systemMessage": "You are an AI Customer Support Agent for a company that sells products.\n\nYour job is to help customers with:\n\nProduct information\nProduct availability\nOrders\nOrder status\nComplaints\nReturns, exchanges, refunds, delivery, warranty and other support questions\n\nYou have access to four Google Sheets tabs:\n\nProducts\nUse this tab to find available products, product names, prices and other product information.\nSecurity_Policy\nUse this tab to answer questions about company policies such as returns, exchanges, refunds, delivery, warranty, damaged orders, missing items and cancellations.\nOrder\nUse this tab to check customer order information.\nThe Order columns are:\nName, Item, Quantityordered, Pending.\nComplaints\nThis sheet is initially empty.\nWhenever a customer makes a complaint, save the complaint in the Complaints sheet.\nDo not ask the customer to provide a Google Sheet URL or Spreadsheet ID. The Google Sheets tools are already connected to the correct spreadsheet.\n\nImportant rules:\n\nAlways use the available Google Sheets tools to get information instead of asking the customer for the spreadsheet URL or Spreadsheet ID.\nDo not invent product names, prices, order details or company policies.\nIf the required information exists in the Products, Security_Policy or Order sheet, use that information in your response.\nIf information is not available in the sheets, clearly tell the customer that the information is not available.\nKeep responses simple, helpful and professional.\nIf the customer wants to place an order, collect the required information such as customer name, product/item and quantity.\nIf the customer asks about an existing order, use the Order sheet to check it.\nIf the customer makes a complaint, record the complaint in the Complaints sheet and then provide a helpful response based on the available information.\nFor complaints, save the customer's name if available, the complaint text, the current date, the status and the response given by the AI.\nDo not create fake order records or fake complaint information.\nNever ask the customer for the Google Sheet URL or Spreadsheet ID.\n\nRespond directly to the customer's message and use the connected tools whenever information from the sheets is required."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -256,
+        -208
+      ],
+      "id": "2b9647f0-b805-49d2-81e4-cec37dfcd861",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -432,
+        144
+      ],
+      "id": "1daea227-99fd-4482-a79b-801d972bfa7f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GEMINI_CREDENTIAL_ID",
+          "name": "YOUR_GEMINI_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -272,
+        64
+      ],
+      "id": "edb9ca52-74fc-4f80-94fc-74139df1dd53",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Customer Support Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1724215192,
+          "mode": "list",
+          "cachedResultName": "Support_Policy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=1724215192"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        144
+      ],
+      "id": "633f9f59-75d8-4192-aa15-9cdd90362f59",
+      "name": "support policy",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Customer Support Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 417778532,
+          "mode": "list",
+          "cachedResultName": "Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=417778532"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "Item": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Item', ``, 'string') }}",
+            "Quantity Ordered": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity_Ordered', ``, 'string') }}",
+            "Pending": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Pending', ``, 'string') }}",
+            "Date": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "49ceca00-1b80-4d50-8c4c-7a9a46534dd1",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "de69b5b5-43a5-4a79-b461-2a1d2ff63369",
+              "displayName": "Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ae6678a9-95ac-4128-b320-59fefe347789",
+              "displayName": "Quantity Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "339a9dfd-8e90-469e-8272-8c4975e26c4f",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ca567004-e2d4-46b8-9900-1afeeb600f2c",
+              "displayName": "Pending",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        80
+      ],
+      "id": "728b43cf-6ee9-4542-9498-4423e9940478",
+      "name": "Order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Customer Support Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1135478397,
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=1135478397"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        144
+      ],
+      "id": "03b6fa50-ba8d-4174-84a2-48abb037c2c4",
+      "name": "Products",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Customer Support Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 207200868,
+          "mode": "list",
+          "cachedResultName": "Complaints",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=207200868"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "Complaint": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Complaint', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}",
+            "AI Response": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('AI_Response', ``, 'string') }}",
+            "Date": "={{ $now.format('yyyy-MM-dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "7594841f-922d-4eca-a8ec-8d37bdba9933",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2c800d45-22fa-4416-b85e-51bf6fa4b3bd",
+              "displayName": "Complaint",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "51d429b3-feb1-46fb-8cb6-99a3fe6abc9c",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "75b08ea8-5ef7-4c60-b768-0b56899d2866",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3f7a444e-ef16-4b0f-b2de-cd11e7d155d3",
+              "displayName": "AI Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        -48
+      ],
+      "id": "7711adb8-5363-44ff-8654-b71ac12b22be",
+      "name": "Complaints",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "all"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        -208
+      ],
+      "id": "02c27b92-8e4e-4d26-85c3-e70168b00222",
+      "name": "WhatsApp Trigger",
+      "webhookId": "b2bb22d7-61ed-4137-8c6b-da0d86afc755",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "YOUR_WHATSAPP_TRIGGER_CREDENTIAL_ID",
+          "name": "YOUR_WHATSAPP_TRIGGER_CREDENTIAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "YOUR_WHATSAPP_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "YOUR_TEST_RECIPIENT_PHONE_NUMBER",
+        "textBody": "working",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -208
+      ],
+      "id": "a9d3e908-331e-4939-afd7-705762fa6c8f",
+      "name": "Send message",
+      "webhookId": "df711e19-9616-4e53-9a6d-498893d9df93",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "YOUR_WHATSAPP_CREDENTIAL_ID",
+          "name": "YOUR_WHATSAPP_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "support policy": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Products": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Complaints": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "03eff279-93be-4978-b636-3c38dc02a000",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e5a073a-a961-4941-9156-996c5b80b8d3"
+  },
+  "nodeGroups": [],
+  "id": "32a5d0eb-e46d-411b-9efe-77f2d15e3ba6",
+  "tags": [],
+  "_github_safety_note": "This workflow export has been sanitized for public GitHub sharing. Replace placeholder Google Sheets, WhatsApp, and credential values with your own credentials/settings when importing into n8n."
+}
