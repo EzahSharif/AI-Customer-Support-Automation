@@ -41,6 +41,7 @@ This project demonstrates how AI agents and workflow automation can be combined 
 
 **Author**
 Izah Sharif
-BS Information Technology
+
+
 
 BS Information Technology
